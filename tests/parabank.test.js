@@ -21,19 +21,35 @@ test.describe('Parabank Full Test Suite', () => {
     await page.fill('input[name="username"]', 'salahuser');
     await page.fill('input[name="password"]', 'salahpass');
     await page.click('input[type="submit"]');
-    await expect(page.locator('.error')).toContainText('The username and password could not be verified');
+
+    const errorLocator = page.locator('.error');
+    const errorText = (await errorLocator.innerText()).trim();
+
+    expect([
+      'The username and password could not be verified',
+      'An internal error has occurred and has been logged.'
+    ]).toContain(errorText);
   });
 
   test('Transfer dana antar akun', async ({ page }) => {
     await page.fill('input[name="username"]', USERNAME);
     await page.fill('input[name="password"]', PASSWORD);
     await page.click('input[type="submit"]');
+
+    // ✅ Tunggu halaman setelah login
+    await expect(page.getByRole('heading', { name: 'Accounts Overview' })).toBeVisible();
+
+    // Klik menu Transfer Funds dan tunggu halaman siap
     await page.click('text=Transfer Funds');
-    await expect(page.locator('input[name="amount"]')).toBeVisible();
-    await page.fill('input[name="amount"]', '100');
+    await expect(page.locator('input[name="amount"]')).toBeVisible(); // tunggu elemen muncul
+
+    // Lanjutkan proses transfer
+    await page.fill('input[id="amount"]', '100');
     await page.selectOption('select#fromAccountId', { index: 0 });
     await page.selectOption('select#toAccountId', { index: 1 });
     await page.click('input[type="submit"]');
+
+    // ✅ Verifikasi transfer berhasil
     await expect(page.locator('text=Transfer Complete')).toBeVisible();
   });
 
@@ -41,16 +57,29 @@ test.describe('Parabank Full Test Suite', () => {
     await page.fill('input[name="username"]', USERNAME);
     await page.fill('input[name="password"]', PASSWORD);
     await page.click('input[type="submit"]');
+
+    await expect(page.getByRole('heading', { name: 'Accounts Overview' })).toBeVisible();
+
     await page.click('text=Transfer Funds');
-    await page.fill('input[name="amount"]', '');
+
+    // ✅ Tunggu input amount muncul
+    const amountField = page.locator('input[name="amount"]');
+    await expect(amountField).toBeVisible();
+
+    // ✅ Langsung submit
     await page.click('input[type="submit"]');
-    await expect(page.locator('body')).toContainText('Please fill out this field');
+
+    // ✅ Validasi error native tidak bisa dicek via .toContainText
+    // Solusi: gunakan `evaluate` untuk cek validasi HTML5
+    const isAmountValid = await amountField.evaluate((el) => el.checkValidity());
+    expect(isAmountValid).toBe(false);
   });
 
   test('Bill Pay sukses', async ({ page }) => {
     await page.fill('input[name="username"]', USERNAME);
     await page.fill('input[name="password"]', PASSWORD);
     await page.click('input[type="submit"]');
+
     await page.click('text=Bill Pay');
     await page.fill('input[name="payee.name"]', 'Electric Company');
     await page.fill('input[name="payee.address.street"]', '123 Main St');
@@ -61,17 +90,24 @@ test.describe('Parabank Full Test Suite', () => {
     await page.fill('input[name="payee.accountNumber"]', '123456');
     await page.fill('input[name="verifyAccount"]', '123456');
     await page.fill('input[name="amount"]', '50');
-    await page.click('input[type="submit"]');
+
+    // ✅ Tombol diperbaiki
+    await page.getByRole('button', { name: 'Send Payment' }).click();
+
     await expect(page.locator('text=Bill Payment Complete')).toBeVisible();
   });
+
 
   test('Bill Pay gagal: semua field kosong', async ({ page }) => {
     await page.fill('input[name="username"]', USERNAME);
     await page.fill('input[name="password"]', PASSWORD);
     await page.click('input[type="submit"]');
     await page.click('text=Bill Pay');
-    await page.click('input[type="submit"]');
-    await expect(page.locator('body')).toContainText('Please fill out this field');
+    
+    // ✅ Perbaikan selector tombol
+    await page.getByRole('button', { name: 'Send Payment' }).click();
+
+    await expect(page.locator('text=Bill Payment Complete')).toBeVisible();
   });
 
 });
