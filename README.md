@@ -32,9 +32,6 @@ ParabankTest/
 ## 🚀 Quick Start
 
 ### 1. Clone Repository
-```bash
-git clone https://github.com/namamu/ParabankTest.git
-cd ParabankTest
 2. Install Dependencies
 
 npm install
