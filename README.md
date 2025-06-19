@@ -19,4 +19,10 @@ Automated UI test suite for [ParaBank Demo Website](https://parabank.parasoft.co
 ---
 
 ## 📂 Project Structure
-
+ParabankTest/
+├── tests/
+│ └── parabank.test.js # All test scenarios
+├── playwright.config.js # Configuration (screenshot, trace, video)
+├── package.json # Scripts & dependencies
+├── README.md
+└── html-report/ # Auto-generated after test run
