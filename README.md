@@ -26,3 +26,48 @@ ParabankTest/
 ├── package.json # Scripts & dependencies
 ├── README.md
 └── html-report/ # Auto-generated after test run
+
+---
+
+## 🚀 Quick Start
+
+### 1. Clone Repository
+```bash
+git clone https://github.com/namamu/ParabankTest.git
+cd ParabankTest
+2. Install Dependencies
+
+npm install
+
+3. Install Playwright Browsers
+
+npx playwright install
+
+4. Run the Tests
+
+npm test
+
+5. View Test Report
+
+npx playwright show-report
+
+🖼️ Automatic Attachments on Failure
+
+    📸 Screenshot: captured when a test fails
+
+    🎞️ Video recording: recorded only on failure
+
+    🧭 Trace viewer: inspect what happened step-by-step
+
+🔐 Default Credentials
+
+    Username: john
+
+    Password: demo
+
+📌 You can register your own account at ParaBank Register Page
+🛠 Built With
+
+    Playwright Test
+
+    Node.js 18+
